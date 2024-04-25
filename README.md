@@ -12,4 +12,4 @@ def deps do
 end
 ```
 
-See the [getting started guide](hexdocs.pm/ash_cloak) on hex!
+See the [getting started guide](https://hexdocs.pm/ash_cloak) on hex!
