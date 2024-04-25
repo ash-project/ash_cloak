@@ -5,7 +5,7 @@ defmodule AshCloak.MixProject do
   An Ash extension for encrypting attribute values.
   """
 
-  @version "0.1.0"
+  @version "0.1.0-rc.0"
 
   def project do
     [
