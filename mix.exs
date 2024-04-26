@@ -30,10 +30,12 @@ defmodule AshCloak.MixProject do
       source_ref: "v#{@version}",
       extra_section: "GUIDES",
       extras: [
-        "documentation/tutorials/getting-started-with-cloak.md"
+        "documentation/tutorials/getting-started-with-cloak.md",
+        "documentation/dsls/Dsl:-AshCloak.md"
       ],
       groups_for_extras: [
-        Tutorials: ~r'documentation/tutorials'
+        Tutorials: ~r'documentation/tutorials',
+        Reference: ~r'documentation/dsls'
       ],
       before_closing_head_tag: fn type ->
         if type == :html do
