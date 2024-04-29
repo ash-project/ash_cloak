@@ -32,7 +32,7 @@ defmodule AshCloak.Transformers.SetupEncryption do
         allow_nil?: attribute.allow_nil?,
         sensitive?: true,
         public?: false,
-        description: "Enrypted #{attribute.name}"
+        description: "Encrypted #{attribute.name}"
       )
       |> Ash.Resource.Builder.add_calculation(
         attribute.name,
