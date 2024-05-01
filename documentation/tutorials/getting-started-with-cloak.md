@@ -56,7 +56,7 @@ Then, we add a _calculation_ matching the original attribute that, when loaded, 
 
 ### Modify Actions
 
-Then, we go through each create, udpate and destroy action that accepts the attribute, and remove the attribute from the accept list.
+Then, we go through each create, update and destroy action that accepts the attribute, and remove the attribute from the accept list.
 
 Then, we add an argument by the same name, and a change that encrypts the attribute value.
 
