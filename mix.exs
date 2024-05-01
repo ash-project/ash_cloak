@@ -30,8 +30,8 @@ defmodule AshCloak.MixProject do
       source_ref: "v#{@version}",
       extra_section: "GUIDES",
       extras: [
-        "documentation/tutorials/getting-started-with-cloak.md",
-        "documentation/dsls/Dsl:-AshCloak.md"
+        "documentation/dsls/Dsl:-AshCloak.md",
+        "documentation/tutorials/getting-started-with-cloak.md"
       ],
       groups_for_extras: [
         Tutorials: ~r'documentation/tutorials',
