@@ -37,6 +37,7 @@ defmodule AshCloak.MixProject do
       ],
       groups_for_extras: [
         Tutorials: ~r"documentation/tutorials",
+        Topics: ~r"documentation/topics",
         Reference: ~r"documentation/dsls"
       ],
       before_closing_head_tag: fn type ->
