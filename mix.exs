@@ -2,7 +2,7 @@ defmodule AshCloak.MixProject do
   use Mix.Project
 
   @description """
-  An Ash extension for encrypting attribute values.
+  An Ash extension to seamlessly encrypt and decrypt resource attributes.
   """
 
   @version "0.1.0-rc.0"
@@ -26,16 +26,18 @@ defmodule AshCloak.MixProject do
 
   defp docs do
     [
-      main: "getting-started-with-cloak",
+      main: "readme",
       source_ref: "v#{@version}",
       extra_section: "GUIDES",
       extras: [
-        "documentation/dsls/Dsl:-AshCloak.md",
-        "documentation/tutorials/getting-started-with-cloak.md"
+        {"README.md", title: "Home"},
+        "documentation/tutorials/getting-started-with-ash-cloak.md",
+        "documentation/topics/how-does-ash-cloak-work.md",
+        "documentation/dsls/DSL:-AshCloak.md"
       ],
       groups_for_extras: [
-        Tutorials: ~r'documentation/tutorials',
-        Reference: ~r'documentation/dsls'
+        Tutorials: ~r"documentation/tutorials",
+        Reference: ~r"documentation/dsls"
       ],
       before_closing_head_tag: fn type ->
         if type == :html do
