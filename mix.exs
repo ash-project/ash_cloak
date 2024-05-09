@@ -33,12 +33,16 @@ defmodule AshCloak.MixProject do
         {"README.md", title: "Home"},
         "documentation/tutorials/getting-started-with-ash-cloak.md",
         "documentation/topics/how-does-ash-cloak-work.md",
-        "documentation/dsls/DSL:-AshCloak.md"
+        "documentation/dsls/DSL:-AshCloak.md",
+        "CHANGELOG.md"
       ],
       groups_for_extras: [
         Tutorials: ~r"documentation/tutorials",
         Topics: ~r"documentation/topics",
-        Reference: ~r"documentation/dsls"
+        Reference: ~r"documentation/dsls",
+        "About AshCloak": [
+          "CHANGELOG.md"
+        ]
       ],
       before_closing_head_tag: fn type ->
         if type == :html do
