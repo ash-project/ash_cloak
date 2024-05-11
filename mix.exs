@@ -5,7 +5,7 @@ defmodule AshCloak.MixProject do
   An Ash extension to seamlessly encrypt and decrypt resource attributes.
   """
 
-  @version "0.1.0-rc.0"
+  @version "0.1.0"
 
   def project do
     [
@@ -87,7 +87,7 @@ defmodule AshCloak.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:ash, ash_version("~> 3.0.0-rc")},
+      {:ash, ash_version("~> 3.0")},
       {:ex_doc, github: "elixir-lang/ex_doc", only: [:dev, :test], runtime: false},
       {:ex_check, "~> 0.12", only: [:dev, :test]},
       {:credo, ">= 0.0.0", only: [:dev, :test], runtime: false},

@@ -16,7 +16,7 @@ if Mix.env() == :dev do
     # Pass in `true` to use `"README.md"` or a string to customize
     manage_readme_version: [
       "README.md",
-      "documentation/tutorials/getting-started-with-cloak.md"
+      "documentation/tutorials/getting-started-with-ash-cloak.md"
     ],
     version_tag_prefix: "v"
 end
