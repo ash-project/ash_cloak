@@ -1,4 +1,5 @@
 defmodule AshCloak.Test.Change do
+  @moduledoc false
   use Ash.Resource.Change
 
   def change(changeset, _opts, _) do
