@@ -39,4 +39,32 @@ defmodule AshCloakTest do
     # only for fields that are being decrypted
     refute_received {:decrypting, _, _, _, _}
   end
+
+  test "encrypt after action change" do
+    encrypted =
+      AshCloak.Test.Resource
+      |> Ash.Changeset.for_create(:change_before_encrypt, %{
+        not_encrypted: "plain",
+        encrypted_always_loaded: %{hello: :world}
+      })
+      |> Ash.Changeset.set_context(%{foo: :bar})
+      |> Ash.create!()
+
+    assert decode(encrypted.encrypted_encrypted) == 13
+  end
+
+  test "it encrypt by set_argument directly" do
+    encrypted =
+      AshCloak.Test.Resource
+      |> Ash.Changeset.new()
+      |> Ash.Changeset.set_argument(:encrypted, 14)
+      |> Ash.Changeset.for_create(:create, %{
+        not_encrypted: "plain",
+        encrypted_always_loaded: %{hello: :world}
+      })
+      |> Ash.Changeset.set_context(%{foo: :bar})
+      |> Ash.create!()
+
+    assert decode(encrypted.encrypted_encrypted) == 14
+  end
 end

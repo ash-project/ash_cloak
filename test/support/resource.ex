@@ -13,6 +13,11 @@ defmodule AshCloak.Test.Resource do
   @attributes [:encrypted, :encrypted_always_loaded, :not_encrypted]
   actions do
     defaults([:read, :destroy, create: @attributes, update: @attributes])
+
+    create :change_before_encrypt do
+      accept(@attributes)
+      change(AshCloak.Test.Change)
+    end
   end
 
   cloak do
