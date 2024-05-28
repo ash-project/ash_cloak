@@ -1,12 +1,10 @@
 ---
-
 name: Bug report
 about: Create a report to help us improve
-title: ''
+title: ""
 labels: bug, needs review
-assignees: ''
-
--https://hexdocs.pm/ash_cloak
+assignees: ""
+---
 
 **Describe the bug**
 A clear and concise description of what the bug is.
