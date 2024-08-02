@@ -39,4 +39,41 @@ defmodule AshCloak do
   }
 
   use Spark.Dsl.Extension, sections: [@cloak], transformers: @transformers
+
+  @doc """
+  Encrypts and writes to an encrypted attribute.
+
+  If the changeset is pending (i.e not currently running the action), then it is added as a before_action hook.
+  Otherwise, it is run immediately
+  """
+  @spec encrypt_and_set(Ash.Changeset.t(), attr :: atom, term :: term) :: Ash.Changeset.t()
+  def encrypt_and_set(changeset, key, value) do
+    if key in AshCloak.Info.cloak_attributes!(changeset.resource) do
+      if changeset.phase == :pending do
+        Ash.Changeset.before_action(changeset, &do_encrypt_and_set(&1, key, value))
+      else
+        do_encrypt_and_set(changeset, key, value)
+      end
+    else
+      raise "Attempted to encrypt and set attribute #{inspect(key)} for resource #{inspect(changeset.resource)}, but it is not configured for encryption."
+    end
+  end
+
+  defp do_encrypt_and_set(changeset, key, value) do
+    vault = AshCloak.Info.cloak_vault!(changeset.resource)
+    encryption_target = String.to_existing_atom("encrypted_#{key}")
+
+    encrypted_value =
+      value
+      |> :erlang.term_to_binary()
+      |> vault.encrypt!()
+      |> Base.encode64()
+
+    changeset
+    |> Ash.Changeset.force_change_attribute(encryption_target, encrypted_value)
+    |> Ash.Changeset.delete_argument(key)
+    |> Map.update!(:params, fn params ->
+      Map.drop(params, [key, to_string(key)])
+    end)
+  end
 end
