@@ -1,5 +1,5 @@
 defmodule AshCloak.Changes.Encrypt do
-  @moduledoc false
+  @moduledoc "Takes an argument, and encrypts it into an attribute called `encrypted_{attribute}`"
   use Ash.Resource.Change
 
   def change(changeset, opts, _) do
