@@ -5,7 +5,7 @@
 Add `ash_cloak` to your list of dependencies in `mix.exs`:
 
 ```elixir
-{:ash_cloak, "~> 0.1.0"}
+{:ash_cloak, "~> 0.1.1"}
 ```
 
 Follow [the cloak getting started guide](https://hexdocs.pm/cloak/readme.html) to add `cloak` as a dependency, as AshCloak does not add a vault implementation for you. Note that you do not need `cloak_ecto` because your Ash data layer will take care of this.
