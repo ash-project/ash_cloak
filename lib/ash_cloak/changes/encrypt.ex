@@ -15,4 +15,17 @@ defmodule AshCloak.Changes.Encrypt do
       end
     end)
   end
+
+  def atomic(changeset, opts, _) do
+    attribute = opts[:field]
+
+    case Ash.Changeset.fetch_argument(changeset, attribute) do
+      {:ok, value} ->
+        encryption_target = String.to_existing_atom("encrypted_#{attribute}")
+        {:atomic, %{encryption_target => AshCloak.do_encrypt(changeset.resource, value)}}
+
+      :error ->
+        changeset
+    end
+  end
 end

@@ -59,15 +59,19 @@ defmodule AshCloak do
     end
   end
 
-  defp do_encrypt_and_set(changeset, key, value) do
-    vault = AshCloak.Info.cloak_vault!(changeset.resource)
-    encryption_target = String.to_existing_atom("encrypted_#{key}")
+  @doc false
+  def do_encrypt(resource, value) do
+    vault = AshCloak.Info.cloak_vault!(resource)
 
-    encrypted_value =
-      value
-      |> :erlang.term_to_binary()
-      |> vault.encrypt!()
-      |> Base.encode64()
+    value
+    |> :erlang.term_to_binary()
+    |> vault.encrypt!()
+    |> Base.encode64()
+  end
+
+  defp do_encrypt_and_set(changeset, key, value) do
+    encrypted_value = do_encrypt(changeset.resource, value)
+    encryption_target = String.to_existing_atom("encrypted_#{key}")
 
     changeset
     |> Ash.Changeset.force_change_attribute(encryption_target, encrypted_value)
