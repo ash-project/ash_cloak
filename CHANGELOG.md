@@ -5,6 +5,15 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v0.1.2](https://github.com/ash-project/ash_cloak/compare/v0.1.1...v0.1.2) (2024-08-19)
+
+
+
+
+### Improvements:
+
+* add atomic implementation for `AshCloack.Changes.Encrypt`
+
 ## [v0.1.1](https://github.com/ash-project/ash_cloak/compare/v0.1.0...v0.1.1) (2024-08-02)
 
 ### Bug Fixes:
