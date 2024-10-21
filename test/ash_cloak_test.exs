@@ -160,4 +160,13 @@ defmodule AshCloakTest do
 
     assert decode(encrypted.encrypted_encrypted) == 14
   end
+
+  test "it encrypts even when the attribute is not in the accept list" do
+    encrypted =
+      AshCloak.Test.Resource
+      |> Ash.Changeset.for_create(:change_without_accept)
+      |> Ash.create!()
+
+    assert decode(encrypted.encrypted_encrypted) == 13
+  end
 end
