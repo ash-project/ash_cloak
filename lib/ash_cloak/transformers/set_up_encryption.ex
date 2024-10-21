@@ -82,11 +82,13 @@ defmodule AshCloak.Transformers.SetupEncryption do
   end
 
   defp rewrite_actions({:ok, dsl}, attr) do
+    cloaked_attrs = AshCloak.Info.cloak_attributes!(dsl)
+
     dsl
     |> Ash.Resource.Info.actions()
     |> Enum.filter(&(&1.type in [:create, :update, :destroy]))
     |> Enum.reduce_while({:ok, dsl}, fn action, {:ok, dsl} ->
-      if attr.name in action.accept do
+      if attr.name in (action.accept ++ cloaked_attrs) do
         new_accept = action.accept -- [attr.name]
 
         with {:ok, argument} <-
