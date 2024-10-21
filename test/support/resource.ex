@@ -18,6 +18,10 @@ defmodule AshCloak.Test.Resource do
       accept(@attributes)
       change(AshCloak.Test.Change)
     end
+
+    create :change_without_accept do
+      change(AshCloak.Test.Change)
+    end
   end
 
   cloak do

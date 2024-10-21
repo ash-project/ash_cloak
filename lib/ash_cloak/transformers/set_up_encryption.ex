@@ -86,36 +86,32 @@ defmodule AshCloak.Transformers.SetupEncryption do
     |> Ash.Resource.Info.actions()
     |> Enum.filter(&(&1.type in [:create, :update, :destroy]))
     |> Enum.reduce_while({:ok, dsl}, fn action, {:ok, dsl} ->
-      if attr.name in action.accept do
-        new_accept = action.accept -- [attr.name]
+      new_accept = action.accept -- [attr.name]
 
-        with {:ok, argument} <-
-               Ash.Resource.Builder.build_action_argument(attr.name, attr.type,
-                 constraints: attr.constraints
-               ),
-             {:ok, change} <-
-               Ash.Resource.Builder.build_action_change(
-                 {AshCloak.Changes.Encrypt, field: attr.name}
-               ) do
-          {:cont,
-           {:ok,
-            Spark.Dsl.Transformer.replace_entity(
-              dsl,
-              [:actions],
-              %{
-                action
-                | arguments: [argument | Enum.reject(action.arguments, &(&1.name == attr.name))],
-                  changes: [change | action.changes],
-                  accept: new_accept
-              },
-              &(&1.name == action.name)
-            )}}
-        else
-          other ->
-            {:halt, other}
-        end
+      with {:ok, argument} <-
+             Ash.Resource.Builder.build_action_argument(attr.name, attr.type,
+               constraints: attr.constraints
+             ),
+           {:ok, change} <-
+             Ash.Resource.Builder.build_action_change(
+               {AshCloak.Changes.Encrypt, field: attr.name}
+             ) do
+        {:cont,
+         {:ok,
+          Spark.Dsl.Transformer.replace_entity(
+            dsl,
+            [:actions],
+            %{
+              action
+              | arguments: [argument | Enum.reject(action.arguments, &(&1.name == attr.name))],
+                changes: [change | action.changes],
+                accept: new_accept
+            },
+            &(&1.name == action.name)
+          )}}
       else
-        {:cont, {:ok, dsl}}
+        other ->
+          {:halt, other}
       end
     end)
   end
