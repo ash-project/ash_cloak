@@ -8,7 +8,7 @@
 
 # AshCloak
 
-AshCloak is an [Ash](https://hexdocs.pm/ash) extension to seamlessly encrypt and decrypt attributes of your resources. 
+AshCloak is an [Ash](https://hexdocs.pm/ash) extension to seamlessly encrypt and decrypt attributes of your resources.
 
 Encrypting attributes ensures that sensitive fields are not stored in the clear in your data layer.
 
@@ -26,4 +26,4 @@ It's recommended to use [Cloak](https://github.com/danielberkompas/cloak) as a v
 
 ## Reference
 
-- [AshCloak DSL](documentation/dsls/DSL:-AshCloak.md)
+- [AshCloak DSL](documentation/dsls/DSL-AshCloak.md)

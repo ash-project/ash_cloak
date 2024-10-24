@@ -33,7 +33,7 @@ defmodule AshCloak.MixProject do
         {"README.md", title: "Home"},
         "documentation/tutorials/getting-started-with-ash-cloak.md",
         "documentation/topics/how-does-ash-cloak-work.md",
-        "documentation/dsls/DSL:-AshCloak.md",
+        "documentation/dsls/DSL-AshCloak.md",
         "CHANGELOG.md"
       ],
       groups_for_extras: [
