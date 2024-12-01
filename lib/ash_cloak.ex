@@ -75,7 +75,7 @@ defmodule AshCloak do
 
     changeset
     |> Ash.Changeset.force_change_attribute(encryption_target, encrypted_value)
-    |> Ash.Changeset.delete_argument(key)
+    |> Map.update!(:arguments, &Map.delete(&1, key))
     |> Map.update!(:params, fn params ->
       Map.drop(params, [key, to_string(key)])
     end)
