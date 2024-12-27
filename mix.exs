@@ -88,7 +88,7 @@ defmodule AshCloak.MixProject do
   defp deps do
     [
       {:ash, ash_version("~> 3.0")},
-      {:ex_doc, github: "elixir-lang/ex_doc", only: [:dev, :test], runtime: false},
+      {:ex_doc, "~> 0.32", only: [:dev, :test], runtime: false},
       {:ex_check, "~> 0.12", only: [:dev, :test]},
       {:credo, ">= 0.0.0", only: [:dev, :test], runtime: false},
       {:dialyxir, ">= 0.0.0", only: [:dev, :test], runtime: false},
