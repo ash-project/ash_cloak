@@ -17,6 +17,7 @@ defmodule AshCloak.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       deps: deps(),
       docs: docs(),
+      dialyzer: [plt_add_apps: [:mix]],
       aliases: aliases(),
       description: @description,
       source_url: "https://github.com/ash-project/ash_cloak",
