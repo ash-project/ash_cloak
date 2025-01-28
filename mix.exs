@@ -16,7 +16,7 @@ defmodule AshCloak.MixProject do
       start_permanent: Mix.env() == :prod,
       elixirc_paths: elixirc_paths(Mix.env()),
       deps: deps(),
-      docs: docs(),
+      docs: &docs/0,
       dialyzer: [plt_add_apps: [:mix]],
       aliases: aliases(),
       description: @description,
@@ -34,7 +34,7 @@ defmodule AshCloak.MixProject do
         {"README.md", title: "Home"},
         "documentation/tutorials/getting-started-with-ash-cloak.md",
         "documentation/topics/how-does-ash-cloak-work.md",
-        "documentation/dsls/DSL-AshCloak.md",
+        {"documentation/dsls/DSL-AshCloak.md", search_data: Spark.Docs.search_data_for(AshCloak)},
         "CHANGELOG.md"
       ],
       groups_for_extras: [
@@ -90,7 +90,7 @@ defmodule AshCloak.MixProject do
     [
       {:ash, ash_version("~> 3.0")},
       {:igniter, "~> 0.5", only: [:dev, :test]},
-      {:ex_doc, "~> 0.32", only: [:dev, :test], runtime: false},
+      {:ex_doc, "~> 0.37-rc", only: [:dev, :test], runtime: false},
       {:ex_check, "~> 0.12", only: [:dev, :test]},
       {:credo, ">= 0.0.0", only: [:dev, :test], runtime: false},
       {:dialyxir, ">= 0.0.0", only: [:dev, :test], runtime: false},
@@ -118,8 +118,7 @@ defmodule AshCloak.MixProject do
       docs: [
         "spark.cheat_sheets",
         "docs",
-        "spark.replace_doc_links",
-        "spark.cheat_sheets_in_search"
+        "spark.replace_doc_links"
       ],
       "spark.formatter": "spark.formatter --extensions AshCloak",
       "spark.cheat_sheets_in_search": "spark.cheat_sheets_in_search --extensions AshCloak",
