@@ -25,7 +25,7 @@ defmodule AshCloak.Changes.Encrypt do
         {:atomic, %{encryption_target => AshCloak.do_encrypt(changeset.resource, value)}}
 
       :error ->
-        changeset
+        {:ok, changeset}
     end
   end
 end
