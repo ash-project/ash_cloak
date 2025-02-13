@@ -5,6 +5,15 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v0.1.4](https://github.com/ash-project/ash_cloak/compare/v0.1.3...v0.1.4) (2025-02-13)
+
+
+
+
+### Bug Fixes:
+
+* return `{:ok, changeset}` to do nothing on encryption change
+
 ## [v0.1.3](https://github.com/ash-project/ash_cloak/compare/v0.1.2...v0.1.3) (2025-01-27)
 
 
