@@ -191,7 +191,7 @@ defmodule AshCloakTest do
     assert decode(changeset.encrypted_encrypted) == 16
 
     # Test with invalid attribute
-    assert_raise Ash.Error.Changes.InvalidAttribute, fn ->
+    assert_raise AshCloak.Errors.NoSuchEncryptedAttribute, fn ->
       AshCloak.Test.Resource
       |> Ash.Changeset.for_create(:create, %{})
       |> AshCloak.encrypt_and_set(:non_existent, "value")
