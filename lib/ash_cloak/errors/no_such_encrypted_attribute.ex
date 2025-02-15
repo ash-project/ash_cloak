@@ -4,7 +4,7 @@ defmodule AshCloak.Errors.NoSuchEncryptedAttribute do
   """
 
   use Splode.Error, fields: [:key, :resource], class: :invalid
-  
+
   def message(error) do
     """
     Attempted to encrypt and set attribute#{for_key(error)}#{for_resource(error)}, but it is not configured for encryption.}
