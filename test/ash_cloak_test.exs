@@ -169,4 +169,32 @@ defmodule AshCloakTest do
 
     assert decode(encrypted.encrypted_encrypted) == 13
   end
+
+  test "encrypt_and_set encrypts and sets values correctly" do
+    # Test with pending changeset
+    pending_changeset =
+      AshCloak.Test.Resource
+      |> Ash.Changeset.for_create(:create, %{not_encrypted: "plain"})
+      |> AshCloak.encrypt_and_set(:encrypted, 15)
+      |> Ash.create!()
+
+    assert decode(pending_changeset.encrypted_encrypted) == 15
+
+    # Test with non-pending changeset (during action)
+    changeset =
+      AshCloak.Test.Resource
+      |> Ash.Changeset.for_create(:create, %{not_encrypted: "plain"})
+      |> Map.put(:phase, :action)
+      |> AshCloak.encrypt_and_set(:encrypted, 16)
+      |> Ash.create!()
+
+    assert decode(changeset.encrypted_encrypted) == 16
+
+    # Test with invalid attribute
+    assert_raise Ash.Error.Changes.InvalidAttribute, fn ->
+      AshCloak.Test.Resource
+      |> Ash.Changeset.for_create(:create, %{})
+      |> AshCloak.encrypt_and_set(:non_existent, "value")
+    end
+  end
 end

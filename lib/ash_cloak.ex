@@ -45,6 +45,8 @@ defmodule AshCloak do
 
   If the changeset is pending (i.e not currently running the action), then it is added as a before_action hook.
   Otherwise, it is run immediately
+  
+  Raises an error if the attribute is not configured for encryption.
   """
   @spec encrypt_and_set(Ash.Changeset.t(), attr :: atom, term :: term) :: Ash.Changeset.t()
   def encrypt_and_set(changeset, key, value) do
@@ -55,7 +57,8 @@ defmodule AshCloak do
         do_encrypt_and_set(changeset, key, value)
       end
     else
-      raise "Attempted to encrypt and set attribute #{inspect(key)} for resource #{inspect(changeset.resource)}, but it is not configured for encryption."
+      message = "Attempted to encrypt and set attribute #{inspect(key)} for resource #{inspect(changeset.resource)}, but it is not configured for encryption."
+      raise Ash.Error.Changes.InvalidAttribute, field: key, message: message
     end
   end
 
