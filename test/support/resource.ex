@@ -10,7 +10,7 @@ defmodule AshCloak.Test.Resource do
     private?(true)
   end
 
-  @attributes [:encrypted, :encrypted_always_loaded, :not_encrypted]
+  @attributes [:encrypted, :encrypted_always_loaded, :encrypted_with_default, :not_encrypted]
   actions do
     defaults([:read, :destroy, create: @attributes, update: @attributes])
 
@@ -26,8 +26,8 @@ defmodule AshCloak.Test.Resource do
 
   cloak do
     vault(AshCloak.Test.Vault)
-    attributes([:encrypted, :encrypted_always_loaded])
-    decrypt_by_default([:encrypted_always_loaded])
+    attributes([:encrypted, :encrypted_always_loaded, :encrypted_with_default])
+    decrypt_by_default([:encrypted_always_loaded, :encrypted_with_default])
 
     on_decrypt(fn resource, records, field, context ->
       send(self(), {:decrypting, resource, records, field, context})
@@ -45,5 +45,6 @@ defmodule AshCloak.Test.Resource do
     attribute(:not_encrypted, :string)
     attribute(:encrypted, :integer, public?: true)
     attribute(:encrypted_always_loaded, :map, public?: true)
+    attribute(:encrypted_with_default, :integer, default: 42, allow_nil?: false, public?: true)
   end
 end

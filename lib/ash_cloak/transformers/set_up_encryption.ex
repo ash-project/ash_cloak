@@ -90,7 +90,8 @@ defmodule AshCloak.Transformers.SetupEncryption do
 
       with {:ok, argument} <-
              Ash.Resource.Builder.build_action_argument(attr.name, attr.type,
-               constraints: attr.constraints
+               constraints: attr.constraints,
+               default: attr.default
              ),
            {:ok, change} <-
              Ash.Resource.Builder.build_action_change(
