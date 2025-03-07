@@ -27,7 +27,7 @@ defmodule AshCloak.Test.Resource do
   cloak do
     vault(AshCloak.Test.Vault)
     attributes([:encrypted, :encrypted_always_loaded, :encrypted_with_default])
-    decrypt_by_default([:encrypted_always_loaded, :encrypted_with_default])
+    decrypt_by_default([:encrypted_always_loaded])
 
     on_decrypt(fn resource, records, field, context ->
       send(self(), {:decrypting, resource, records, field, context})
