@@ -170,6 +170,15 @@ defmodule AshCloakTest do
     assert decode(encrypted.encrypted_encrypted) == 13
   end
 
+  test "it encrypts with default value" do
+    encrypted =
+      AshCloak.Test.Resource
+      |> Ash.Changeset.for_create(:create, %{})
+      |> Ash.create!()
+
+    assert decode(encrypted.encrypted_encrypted_with_default) == 42
+  end
+
   test "encrypt_and_set encrypts and sets values correctly" do
     # Test with pending changeset
     pending_changeset =
