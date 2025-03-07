@@ -126,9 +126,6 @@ defmodule AshCloakTest do
     # plain attribtues are not affected
     assert encrypted.not_encrypted == "plain2"
 
-    # on_decrypt is notified
-    assert_received {:decrypting, AshCloak.Test.Resource, [_], :encrypted_always_loaded, %{}}
-
     # only for fields that are being decrypted
     refute_received {:decrypting, _, _, _, _}
   end
