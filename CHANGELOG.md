@@ -5,6 +5,15 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v0.1.5](https://github.com/ash-project/ash_cloak/compare/v0.1.4...v0.1.5) (2025-03-11)
+
+
+
+
+### Bug Fixes:
+
+* Apply default of attribute to argument (#80)
+
 ## [v0.1.4](https://github.com/ash-project/ash_cloak/compare/v0.1.3...v0.1.4) (2025-02-13)
 
 
