@@ -176,6 +176,23 @@ defmodule AshCloakTest do
     assert decode(encrypted.encrypted_encrypted_with_default) == 42
   end
 
+  test "it doesn't update not accepted encrypted fields with default value" do
+    encrypted =
+      AshCloak.Test.Resource
+      |> Ash.Changeset.for_create(:create, %{encrypted_with_default: 1})
+      |> Ash.create!()
+
+    assert decode(encrypted.encrypted_encrypted_with_default) == 1
+
+    updated_encrypted =
+      encrypted
+      |> Ash.Changeset.for_update(:update_not_encrypted, %{not_encrypted: "plain"})
+      |> Ash.update!()
+
+    assert updated_encrypted.not_encrypted == "plain"
+    assert decode(updated_encrypted.encrypted_encrypted_with_default) == 1
+  end
+
   test "encrypt_and_set encrypts and sets values correctly" do
     # Test with pending changeset
     pending_changeset =

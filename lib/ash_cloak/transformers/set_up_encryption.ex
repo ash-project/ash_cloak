@@ -88,11 +88,14 @@ defmodule AshCloak.Transformers.SetupEncryption do
     |> Enum.reduce_while({:ok, dsl}, fn action, {:ok, dsl} ->
       new_accept = action.accept -- [attr.name]
 
+      opts =
+        case action.type do
+          :create -> [constraints: attr.constraints, default: attr.default]
+          _ -> [constraints: attr.constraints]
+        end
+
       with {:ok, argument} <-
-             Ash.Resource.Builder.build_action_argument(attr.name, attr.type,
-               constraints: attr.constraints,
-               default: attr.default
-             ),
+             Ash.Resource.Builder.build_action_argument(attr.name, attr.type, opts),
            {:ok, change} <-
              Ash.Resource.Builder.build_action_change(
                {AshCloak.Changes.Encrypt, field: attr.name}
