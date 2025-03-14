@@ -5,6 +5,15 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v0.1.6](https://github.com/ash-project/ash_cloak/compare/v0.1.5...v0.1.6) (2025-03-14)
+
+
+
+
+### Bug Fixes:
+
+* Apply default of attrs only for create actions (#84)
+
 ## [v0.1.5](https://github.com/ash-project/ash_cloak/compare/v0.1.4...v0.1.5) (2025-03-11)
 
 
