@@ -22,6 +22,10 @@ defmodule AshCloak.Test.Resource do
     create :change_without_accept do
       change(AshCloak.Test.Change)
     end
+
+    update :update_not_encrypted do
+      accept([:not_encrypted])
+    end
   end
 
   cloak do
