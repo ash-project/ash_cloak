@@ -13,7 +13,7 @@ defmodule AshCloak.Transformers.SetupEncryption do
       if !attribute do
         raise Spark.Error.DslError,
           module: module,
-          message: "No attribute called #{inspect(attribute)} found",
+          message: "No attribute called #{inspect(attr)} found",
           path: [:cloak, :attributes]
       end
 
