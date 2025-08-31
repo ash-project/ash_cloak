@@ -5,6 +5,15 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v0.1.7](https://github.com/ash-project/ash_cloak/compare/v0.1.6...v0.1.7) (2025-08-31)
+
+
+
+
+### Bug Fixes:
+
+* fix the missing attribute name when the passed attribute does not exist (#116) by Simon Bergström
+
 ## [v0.1.6](https://github.com/ash-project/ash_cloak/compare/v0.1.5...v0.1.6) (2025-03-14)
 
 
