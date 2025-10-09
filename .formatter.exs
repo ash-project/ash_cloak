@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Zach Daniel
+#
+# SPDX-License-Identifier: MIT
+
 spark_locals_without_parens = [attributes: 1, decrypt_by_default: 1, on_decrypt: 1, vault: 1]
 
 [

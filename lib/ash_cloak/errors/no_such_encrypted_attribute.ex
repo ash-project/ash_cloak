@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Zach Daniel
+#
+# SPDX-License-Identifier: MIT
+
 defmodule AshCloak.Errors.NoSuchEncryptedAttribute do
   @moduledoc """
   An error raised when attempting to decrypt an attribute that is not encrypted.
