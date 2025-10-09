@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Zach Daniel
+#
+# SPDX-License-Identifier: MIT
+
 defmodule AshCloak.Changes.Encrypt do
   @moduledoc "Takes an argument, and encrypts it into an attribute called `encrypted_{attribute}`"
   use Ash.Resource.Change

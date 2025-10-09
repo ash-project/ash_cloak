@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Zach Daniel
+#
+# SPDX-License-Identifier: MIT
+
 defmodule AshCloak.MixProject do
   use Mix.Project
 
@@ -72,12 +76,19 @@ defmodule AshCloak.MixProject do
 
   defp package do
     [
-      name: :ash_cloak,
+      maintainers: [
+        "Zach Daniel <zach@zachdaniel.dev>"
+      ],
       licenses: ["MIT"],
       files: ~w(lib .formatter.exs mix.exs README* LICENSE*
       CHANGELOG* documentation),
       links: %{
-        GitHub: "https://github.com/ash-project/ash_cloak"
+        "GitHub" => "https://github.com/ash-project/ash_cloak",
+        "Changelog" => "https://github.com/ash-project/ash_cloak/blob/main/CHANGELOG.md",
+        "Discord" => "https://discord.gg/HTHRaaVPUc",
+        "Website" => "https://ash-hq.org",
+        "Forum" => "https://elixirforum.com/c/elixir-framework-forums/ash-framework-forum",
+        "REUSE Compliance" => "https://api.reuse.software/info/github.com/ash-project/ash_cloak"
       }
     ]
   end
