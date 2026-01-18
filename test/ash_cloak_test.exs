@@ -224,4 +224,12 @@ defmodule AshCloakTest do
       |> AshCloak.encrypt_and_set(:non_existent, "value")
     end
   end
+
+  test "does not automatically add encrypted attributes to accepts list" do
+    assert_raise Ash.Error.Invalid, ~r/No such input `encrypted`/, fn ->
+      AshCloak.Test.Resource
+      |> Ash.Changeset.for_create(:change_without_accept, %{encrypted: 42})
+      |> Ash.create!()
+    end
+  end
 end
