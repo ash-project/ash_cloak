@@ -11,6 +11,13 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v0.2.0](https://github.com/ash-project/ash_cloak/compare/v0.1.7...v0.2.0) (2026-01-20)
+### Breaking Changes:
+
+* don't encrypt attributes not in action accept list by Zach Daniel
+
+
+
 ## [v0.1.7](https://github.com/ash-project/ash_cloak/compare/v0.1.6...v0.1.7) (2025-08-31)
 
 
