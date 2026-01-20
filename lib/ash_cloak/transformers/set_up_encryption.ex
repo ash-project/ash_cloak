@@ -88,7 +88,7 @@ defmodule AshCloak.Transformers.SetupEncryption do
   defp rewrite_actions({:ok, dsl}, attr) do
     dsl
     |> Ash.Resource.Info.actions()
-    |> Enum.filter(&(&1.type in [:create, :update, :destroy]))
+    |> Enum.filter(&(&1.type in [:create, :update, :destroy] && attr.name in &1.accept))
     |> Enum.reduce_while({:ok, dsl}, fn action, {:ok, dsl} ->
       new_accept = action.accept -- [attr.name]
 
