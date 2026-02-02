@@ -163,11 +163,13 @@ defmodule AshCloakTest do
   end
 
   test "it does not encrypt when the attribute is not in the accept list" do
-    assert_raise Ash.Error.Invalid, ~r/attribute encrypted_encrypted_with_default is required/, fn ->
-      AshCloak.Test.Resource
-      |> Ash.Changeset.for_create(:change_without_accept)
-      |> Ash.create!()
-    end
+    assert_raise Ash.Error.Invalid,
+                 ~r/attribute encrypted_encrypted_with_default is required/,
+                 fn ->
+                   AshCloak.Test.Resource
+                   |> Ash.Changeset.for_create(:change_without_accept)
+                   |> Ash.create!()
+                 end
   end
 
   test "it encrypts with default value" do
