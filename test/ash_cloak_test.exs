@@ -226,6 +226,18 @@ defmodule AshCloakTest do
     end
   end
 
+  test "propagates allow_nil? from attribute to action argument" do
+    create_action = Ash.Resource.Info.action(AshCloak.Test.Resource, :create)
+
+    # encrypted_with_default has allow_nil?: false on the attribute
+    arg = Enum.find(create_action.arguments, &(&1.name == :encrypted_with_default))
+    assert arg.allow_nil? == false
+
+    # encrypted has allow_nil?: true (default) on the attribute
+    arg = Enum.find(create_action.arguments, &(&1.name == :encrypted))
+    assert arg.allow_nil? == true
+  end
+
   test "does not automatically allow passing encrypted fields as action input" do
     assert_raise Ash.Error.Invalid, ~r/No such input `encrypted`/, fn ->
       AshCloak.Test.Resource

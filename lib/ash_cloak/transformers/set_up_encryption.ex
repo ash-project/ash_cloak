@@ -94,8 +94,11 @@ defmodule AshCloak.Transformers.SetupEncryption do
 
       opts =
         case action.type do
-          :create -> [constraints: attr.constraints, default: attr.default]
-          _ -> [constraints: attr.constraints]
+          :create ->
+            [allow_nil?: attr.allow_nil?, constraints: attr.constraints, default: attr.default]
+
+          _ ->
+            [constraints: attr.constraints]
         end
 
       with {:ok, argument} <-
