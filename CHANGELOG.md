@@ -11,6 +11,15 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v0.2.1](https://github.com/ash-project/ash_cloak/compare/v0.2.0...v0.2.1) (2026-04-13)
+
+
+
+
+### Bug Fixes:
+
+* propagate allow_nil? from attribute to create action argument (#138) by Kamil Badyla
+
 ## [v0.2.0](https://github.com/ash-project/ash_cloak/compare/v0.1.7...v0.2.0) (2026-01-20)
 ### Breaking Changes:
 
