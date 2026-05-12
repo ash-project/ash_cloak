@@ -2,13 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-spark_locals_without_parens = [
-  attributes: 1,
-  decrypt_by_default: 1,
-  on_decrypt: 1,
-  vault: 1,
-  vault_selector: 1
-]
+spark_locals_without_parens = [attributes: 1, decrypt_by_default: 1, on_decrypt: 1, vault: 1]
 
 [
   inputs: ["{mix,.formatter}.exs", "{config,lib,test}/**/*.{ex,exs}"],

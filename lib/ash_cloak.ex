@@ -18,8 +18,9 @@ defmodule AshCloak do
     describe: "Encrypt attributes of a resource",
     schema: [
       vault: [
-        type: {:behaviour, Cloak.Vault},
-        doc: "The vault to use to encrypt & decrypt the value",
+        type: {:or, [{:behaviour, Cloak.Vault}, {:fun, 2}, :mfa]},
+        doc:
+          "The vault to use to encrypt & decrypt the value. Accepts a module implementing `Cloak.Vault`, a `fun/2` of the form `(resource_module, context) -> vault_module`, or an MFA tuple. When a function or MFA is given, it is called at every encrypt and decrypt operation and its return value is used as the vault module.",
         required: true
       ],
       attributes: [
@@ -38,11 +39,6 @@ defmodule AshCloak do
         type: {:or, [{:fun, 4}, :mfa]},
         doc:
           "A function to call when decrypting any value. Takes the resource, field, records, and calculation context. Must return `:ok` or `{:error, error}`"
-      ],
-      vault_selector: [
-        type: {:or, [{:fun, 2}, :mfa]},
-        doc:
-          "An optional function `(resource_module, context) -> vault_module` called at encrypt and decrypt time to select the vault. When present, its return value takes precedence over the statically configured `vault`. The returned module must implement `encrypt!/1` and `decrypt!/1`. Both `%Ash.Resource.Change.Context{}` and `%Ash.Resource.Calculation.Context{}` may be passed as `context` depending on the call site."
       ]
     ]
   }
@@ -72,15 +68,15 @@ defmodule AshCloak do
 
   @doc false
   def resolve_vault(resource, context) do
-    case AshCloak.Info.cloak_vault_selector(resource) do
-      {:ok, {m, f, a}} when not is_nil(context) ->
-        apply(m, f, [resource, context] ++ List.wrap(a))
+    case AshCloak.Info.cloak_vault!(resource) do
+      {m, f, a} ->
+        apply(m, f, [resource, context | List.wrap(a)])
 
-      {:ok, fun} when is_function(fun, 2) and not is_nil(context) ->
+      fun when is_function(fun, 2) ->
         fun.(resource, context)
 
-      _ ->
-        AshCloak.Info.cloak_vault!(resource)
+      vault ->
+        vault
     end
   end
 

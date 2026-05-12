@@ -18,7 +18,7 @@ defmodule AshCloak.VaultSelectorTest do
     end
   end
 
-  describe "vault_selector (MFA form)" do
+  describe "vault MFA selector" do
     test "uses static vault when source_context has no test_vault key" do
       record =
         AshCloak.Test.ResourceWithSelector
@@ -127,7 +127,7 @@ defmodule AshCloak.VaultSelectorTest do
     end
   end
 
-  describe "encrypt_and_set with vault_selector" do
+  describe "encrypt_and_set with dynamic vault" do
     test "encrypt_and_set without Ash action context falls back to static vault" do
       record =
         AshCloak.Test.ResourceWithSelector

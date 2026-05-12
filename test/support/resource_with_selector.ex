@@ -4,6 +4,8 @@
 
 defmodule AshCloak.Test.VaultSelector do
   @moduledoc false
+  def select(_resource, nil), do: AshCloak.Test.Vault
+
   def select(_resource, context) do
     case Map.get(context, :source_context, %{}) do
       %{test_vault: :alt} -> AshCloak.Test.AltVault
@@ -29,9 +31,8 @@ defmodule AshCloak.Test.ResourceWithSelector do
   end
 
   cloak do
-    vault(AshCloak.Test.Vault)
+    vault({AshCloak.Test.VaultSelector, :select, []})
     attributes([:encrypted])
-    vault_selector({AshCloak.Test.VaultSelector, :select, []})
   end
 
   attributes do
