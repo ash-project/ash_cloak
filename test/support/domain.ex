@@ -8,5 +8,6 @@ defmodule AshCloak.Test.Domain do
 
   resources do
     resource(AshCloak.Test.Resource)
+    resource(AshCloak.Test.ResourceWithSelector)
   end
 end

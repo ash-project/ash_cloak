@@ -24,6 +24,7 @@ Encrypt attributes of a resource
 | [`attributes`](#cloak-attributes){: #cloak-attributes } | `atom \| list(atom)` | `[]` | The attribute or attributes to encrypt. The attribute will be renamed to `encrypted_{attribute}`, and a calculation with the same name will be added. |
 | [`decrypt_by_default`](#cloak-decrypt_by_default){: #cloak-decrypt_by_default } | `atom \| list(atom)` | `[]` | A list of attributes that should be decrypted (their calculation should be loaded) by default. |
 | [`on_decrypt`](#cloak-on_decrypt){: #cloak-on_decrypt } | `(any, any, any, any -> any) \| mfa` |  | A function to call when decrypting any value. Takes the resource, field, records, and calculation context. Must return `:ok` or `{:error, error}` |
+| [`vault_selector`](#cloak-vault_selector){: #cloak-vault_selector } | `(any, any -> any) \| mfa` |  | An optional function `(resource_module, context) -> vault_module` called at encrypt and decrypt time to select the vault. When present, its return value takes precedence over the statically configured `vault`. The returned module must implement `encrypt!/1` and `decrypt!/1`. Both `%Ash.Resource.Change.Context{}` and `%Ash.Resource.Calculation.Context{}` may be passed as `context` depending on the call site. |
 
 
 

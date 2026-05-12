@@ -9,7 +9,7 @@ defmodule AshCloak.Calculations.Decrypt do
   def load(_, opts, _), do: [opts[:field]]
 
   def calculate([%resource{} | _] = records, opts, context) do
-    vault = AshCloak.Info.cloak_vault!(resource)
+    vault = AshCloak.resolve_vault(resource, context)
     plain_field = opts[:plain_field]
 
     case approve_decrypt(resource, records, plain_field, context) do

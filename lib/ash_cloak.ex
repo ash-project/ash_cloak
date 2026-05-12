@@ -38,6 +38,11 @@ defmodule AshCloak do
         type: {:or, [{:fun, 4}, :mfa]},
         doc:
           "A function to call when decrypting any value. Takes the resource, field, records, and calculation context. Must return `:ok` or `{:error, error}`"
+      ],
+      vault_selector: [
+        type: {:or, [{:fun, 2}, :mfa]},
+        doc:
+          "An optional function `(resource_module, context) -> vault_module` called at encrypt and decrypt time to select the vault. When present, its return value takes precedence over the statically configured `vault`. The returned module must implement `encrypt!/1` and `decrypt!/1`. Both `%Ash.Resource.Change.Context{}` and `%Ash.Resource.Calculation.Context{}` may be passed as `context` depending on the call site."
       ]
     ]
   }
@@ -53,12 +58,12 @@ defmodule AshCloak do
   Raises AshCloak.Errors.NoSuchEncryptedAttribute if the attribute is not configured for encryption.
   """
   @spec encrypt_and_set(Ash.Changeset.t(), attr :: atom, term :: term) :: Ash.Changeset.t()
-  def encrypt_and_set(changeset, key, value) do
+  def encrypt_and_set(changeset, key, value, context \\ nil) do
     if key in AshCloak.Info.cloak_attributes!(changeset.resource) do
       if changeset.phase == :pending do
-        Ash.Changeset.before_action(changeset, &do_encrypt_and_set(&1, key, value))
+        Ash.Changeset.before_action(changeset, &do_encrypt_and_set(&1, key, value, context))
       else
-        do_encrypt_and_set(changeset, key, value)
+        do_encrypt_and_set(changeset, key, value, context)
       end
     else
       raise AshCloak.Errors.NoSuchEncryptedAttribute, key: key, resource: changeset.resource
@@ -66,8 +71,22 @@ defmodule AshCloak do
   end
 
   @doc false
-  def do_encrypt(resource, value) do
-    vault = AshCloak.Info.cloak_vault!(resource)
+  def resolve_vault(resource, context) do
+    case AshCloak.Info.cloak_vault_selector(resource) do
+      {:ok, {m, f, a}} when not is_nil(context) ->
+        apply(m, f, [resource, context] ++ List.wrap(a))
+
+      {:ok, fun} when is_function(fun, 2) and not is_nil(context) ->
+        fun.(resource, context)
+
+      _ ->
+        AshCloak.Info.cloak_vault!(resource)
+    end
+  end
+
+  @doc false
+  def do_encrypt(resource, value, context \\ nil) do
+    vault = resolve_vault(resource, context)
 
     value
     |> :erlang.term_to_binary()
@@ -75,8 +94,8 @@ defmodule AshCloak do
     |> Base.encode64()
   end
 
-  defp do_encrypt_and_set(changeset, key, value) do
-    encrypted_value = do_encrypt(changeset.resource, value)
+  defp do_encrypt_and_set(changeset, key, value, context) do
+    encrypted_value = do_encrypt(changeset.resource, value, context)
     encryption_target = String.to_existing_atom("encrypted_#{key}")
 
     changeset
