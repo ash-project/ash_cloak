@@ -18,8 +18,9 @@ defmodule AshCloak do
     describe: "Encrypt attributes of a resource",
     schema: [
       vault: [
-        type: {:behaviour, Cloak.Vault},
-        doc: "The vault to use to encrypt & decrypt the value",
+        type: {:or, [{:behaviour, Cloak.Vault}, {:fun, 2}, :mfa]},
+        doc:
+          "The vault to use to encrypt & decrypt the value. Accepts a module implementing `Cloak.Vault`, a `fun/2` of the form `(resource_module, context) -> vault_module`, or an MFA tuple. When a function or MFA is given, it is called at every encrypt and decrypt operation and its return value is used as the vault module.",
         required: true
       ],
       attributes: [
@@ -53,12 +54,12 @@ defmodule AshCloak do
   Raises AshCloak.Errors.NoSuchEncryptedAttribute if the attribute is not configured for encryption.
   """
   @spec encrypt_and_set(Ash.Changeset.t(), attr :: atom, term :: term) :: Ash.Changeset.t()
-  def encrypt_and_set(changeset, key, value) do
+  def encrypt_and_set(changeset, key, value, context \\ nil) do
     if key in AshCloak.Info.cloak_attributes!(changeset.resource) do
       if changeset.phase == :pending do
-        Ash.Changeset.before_action(changeset, &do_encrypt_and_set(&1, key, value))
+        Ash.Changeset.before_action(changeset, &do_encrypt_and_set(&1, key, value, context))
       else
-        do_encrypt_and_set(changeset, key, value)
+        do_encrypt_and_set(changeset, key, value, context)
       end
     else
       raise AshCloak.Errors.NoSuchEncryptedAttribute, key: key, resource: changeset.resource
@@ -66,8 +67,22 @@ defmodule AshCloak do
   end
 
   @doc false
-  def do_encrypt(resource, value) do
-    vault = AshCloak.Info.cloak_vault!(resource)
+  def resolve_vault(resource, context) do
+    case AshCloak.Info.cloak_vault!(resource) do
+      {m, f, a} ->
+        apply(m, f, [resource, context | List.wrap(a)])
+
+      fun when is_function(fun, 2) ->
+        fun.(resource, context)
+
+      vault ->
+        vault
+    end
+  end
+
+  @doc false
+  def do_encrypt(resource, value, context \\ nil) do
+    vault = resolve_vault(resource, context)
 
     value
     |> :erlang.term_to_binary()
@@ -75,8 +90,8 @@ defmodule AshCloak do
     |> Base.encode64()
   end
 
-  defp do_encrypt_and_set(changeset, key, value) do
-    encrypted_value = do_encrypt(changeset.resource, value)
+  defp do_encrypt_and_set(changeset, key, value, context) do
+    encrypted_value = do_encrypt(changeset.resource, value, context)
     encryption_target = String.to_existing_atom("encrypted_#{key}")
 
     changeset

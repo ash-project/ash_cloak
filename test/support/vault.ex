@@ -8,3 +8,10 @@ defmodule AshCloak.Test.Vault do
 
   def decrypt!("encrypted " <> value), do: value
 end
+
+defmodule AshCloak.Test.AltVault do
+  @moduledoc false
+  def encrypt!(value) when is_binary(value), do: "alt_encrypted #{value}"
+
+  def decrypt!("alt_encrypted " <> value), do: value
+end
