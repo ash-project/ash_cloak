@@ -11,6 +11,19 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v0.3.0](https://github.com/ash-project/ash_cloak/compare/v0.2.1...v0.3.0) (2026-05-25)
+
+
+
+
+### Features:
+
+* add vault_selector DSL option for runtime vault selection (#143) by ryanrborn
+
+### Bug Fixes:
+
+* handle Ash 3.26 automatically decoding embedded fields by Zach Daniel
+
 ## [v0.2.1](https://github.com/ash-project/ash_cloak/compare/v0.2.0...v0.2.1) (2026-04-13)
 
 
