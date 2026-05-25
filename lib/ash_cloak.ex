@@ -84,10 +84,23 @@ defmodule AshCloak do
   def do_encrypt(resource, value, context \\ nil) do
     vault = resolve_vault(resource, context)
 
-    value
-    |> :erlang.term_to_binary()
-    |> vault.encrypt!()
-    |> Base.encode64()
+    encrypted =
+      value
+      |> :erlang.term_to_binary()
+      |> vault.encrypt!()
+
+    if embedded_binary_handles_encoding?(resource) do
+      encrypted
+    else
+      Base.encode64(encrypted)
+    end
+  end
+
+  @doc false
+  def embedded_binary_handles_encoding?(resource) do
+    Ash.Resource.Info.embedded?(resource) and
+      Code.ensure_loaded?(Ash.Type.Binary) and
+      function_exported?(Ash.Type.Binary, :cast_from_embedded, 2)
   end
 
   defp do_encrypt_and_set(changeset, key, value, context) do

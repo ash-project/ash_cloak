@@ -238,6 +238,48 @@ defmodule AshCloakTest do
     assert arg.allow_nil? == true
   end
 
+  test "decrypts pre-Ash-3.26 stored embedded values after upgrade" do
+    # Simulates the bug from https://github.com/ash-project/ash_cloak/issues/144:
+    # data was encrypted/written under Ash < 3.26 (before Ash.Type.Binary had
+    # dump_to_embedded/cast_from_embedded). The stored representation is just
+    # the AshCloak base64 string. After upgrading to Ash 3.26, that stored
+    # value is passed through cast_from_embedded on read, which base64-decodes
+    # once. Without the fix, AshCloak would then try to base64-decode the raw
+    # ciphertext and crash.
+    encrypted_b64 = AshCloak.do_encrypt(AshCloak.Test.EmbeddedResource, 99)
+
+    # Apply what Ash 3.26's cast_from_embedded does to that stored value.
+    {:ok, after_cast} = Ash.Type.Binary.cast_from_embedded(encrypted_b64, [])
+
+    record = %AshCloak.Test.EmbeddedResource{
+      id: Ash.UUID.generate(),
+      encrypted_encrypted: after_cast
+    }
+
+    decrypted = Ash.load!(record, [:encrypted], domain: AshCloak.Test.Domain)
+
+    assert decrypted.encrypted == 99
+  end
+
+  test "round-trips new writes on Ash 3.26+ embedded resources" do
+    encrypted_b64_or_raw = AshCloak.do_encrypt(AshCloak.Test.EmbeddedResource, 42)
+
+    # Simulate the new write/read cycle: AshCloak produces a value, Ash's
+    # dump_to_embedded base64-encodes it for storage, then cast_from_embedded
+    # decodes on read. The result should be decryptable.
+    {:ok, stored} = Ash.Type.Binary.dump_to_embedded(encrypted_b64_or_raw, [])
+    {:ok, loaded} = Ash.Type.Binary.cast_from_embedded(stored, [])
+
+    record = %AshCloak.Test.EmbeddedResource{
+      id: Ash.UUID.generate(),
+      encrypted_encrypted: loaded
+    }
+
+    decrypted = Ash.load!(record, [:encrypted], domain: AshCloak.Test.Domain)
+
+    assert decrypted.encrypted == 42
+  end
+
   test "does not automatically allow passing encrypted fields as action input" do
     assert_raise Ash.Error.Invalid, ~r/No such input `encrypted`/, fn ->
       AshCloak.Test.Resource

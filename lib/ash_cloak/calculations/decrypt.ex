@@ -11,6 +11,7 @@ defmodule AshCloak.Calculations.Decrypt do
   def calculate([%resource{} | _] = records, opts, context) do
     vault = AshCloak.resolve_vault(resource, context)
     plain_field = opts[:plain_field]
+    skip_base64? = AshCloak.embedded_binary_handles_encoding?(resource)
 
     case approve_decrypt(resource, records, plain_field, context) do
       :ok ->
@@ -23,7 +24,7 @@ defmodule AshCloak.Calculations.Decrypt do
 
             value ->
               value
-              |> Base.decode64!()
+              |> maybe_decode64(skip_base64?)
               |> vault.decrypt!()
               |> Ash.Helpers.non_executable_binary_to_term()
           end
@@ -35,6 +36,9 @@ defmodule AshCloak.Calculations.Decrypt do
   end
 
   def calculate([], _, _), do: []
+
+  defp maybe_decode64(value, true), do: value
+  defp maybe_decode64(value, false), do: Base.decode64!(value)
 
   defp approve_decrypt(resource, records, field, context) do
     case AshCloak.Info.cloak_on_decrypt(resource) do
