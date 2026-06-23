@@ -10,5 +10,6 @@ defmodule AshCloak.Test.Domain do
     resource(AshCloak.Test.Resource)
     resource(AshCloak.Test.ResourceWithSelector)
     resource(AshCloak.Test.ContainerResource)
+    resource(AshCloak.Test.ResourceWithEmbedded)
   end
 end
