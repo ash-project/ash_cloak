@@ -4,67 +4,77 @@
 
 defmodule AshCloak.EmbeddedSerializationTest do
   @moduledoc """
-  Reproduces how ash_cloak serializes an encrypted attribute whose type is an
-  embedded resource.
+  An encrypted attribute whose type is an embedded resource (or a union of embedded
+  resources) is serialized through the type's embedded representation
+  (`Ash.Type.dump_to_embedded/3`) and restored via `Ash.Type.cast_from_embedded/3`, so
+  it gets the same schema-evolution semantics as an unencrypted embedded attribute.
 
-  The encryption path serializes the in-memory Elixir struct via
-  `:erlang.term_to_binary/1`, instead of going through the type's storage
-  representation (`dump_to_native/2`). On read it `binary_to_term`s the struct
-  straight back, instead of `cast_stored/2`.
+  Data written before this change (the raw struct, `term_to_binary`'d with no tag)
+  must keep decrypting.
   """
   use ExUnit.Case
 
-  require Ash.Query
-
-  alias AshCloak.Test.{EmbeddedProfile, ResourceWithEmbedded}
+  alias AshCloak.Test.{EmbeddedProfile, ResourceWithEmbedded, ResourceWithUnion}
 
   # Mirrors the AshCloak.Test.Vault format: "encrypted " <> term_to_binary, base64-encoded.
   defp decode(value) do
-    "encrypted " <> value = Base.decode64!(value)
-    Ash.Helpers.non_executable_binary_to_term(value)
+    "encrypted " <> binary = Base.decode64!(value)
+    Ash.Helpers.non_executable_binary_to_term(binary)
   end
 
-  test "the stored ciphertext is the raw struct, not the type's storage representation" do
+  defp embedded_representation(resource, field, value) do
+    %{type: type, constraints: constraints} = Ash.Resource.Info.calculation(resource, field)
+    {:ok, dumped} = Ash.Type.dump_to_embedded(type, value, constraints)
+    dumped
+  end
+
+  test "an embedded attribute stores its storage representation, not the raw struct" do
     record =
       ResourceWithEmbedded
       |> Ash.Changeset.for_create(:create, %{profile: %{nickname: "neo", age: 30}})
       |> Ash.create!()
 
-    stored = decode(record.encrypted_profile)
+    assert {:__ash_cloak__, dumped} = decode(record.encrypted_profile)
 
-    # What ash_cloak actually persists: the full in-memory struct, __struct__ tag and all.
-    assert is_struct(stored, EmbeddedProfile)
-    assert %EmbeddedProfile{nickname: "neo", age: 30} = stored
+    # The stored payload is the struct-free embedded representation: no __struct__ tag,
+    # and no internal fields that dump_to_embedded/3 strips.
+    refute is_struct(dumped)
+    assert is_map(dumped)
+    refute Map.has_key?(dumped, :__meta__)
+    assert dumped == embedded_representation(ResourceWithEmbedded, :profile, record.profile)
 
-    # Internal fields that dump_to_native/2 would strip leak into the payload.
-    assert Map.has_key?(stored, :__meta__)
-
-    # What an unencrypted embedded attribute would persist (the jsonb the data layer sees):
-    # a plain, struct-free map produced by the type's dump_to_native/2.
-    {:ok, storage_representation} = Ash.Type.dump_to_native(EmbeddedProfile, stored, [])
-
-    refute is_struct(storage_representation)
-    assert is_map(storage_representation)
-    refute Map.has_key?(storage_representation, :__meta__)
-
-    # The two diverge: encryption bypasses the storage representation entirely.
-    refute stored == storage_representation
+    # It round-trips back through cast_from_embedded/3 into a clean struct.
+    assert %EmbeddedProfile{nickname: "neo", age: 30} = record.profile
   end
 
-  test "decryption restores the struct via binary_to_term, bypassing cast_stored/2" do
+  test "a union-of-embedded attribute stores its storage representation" do
     record =
-      ResourceWithEmbedded
-      |> Ash.Changeset.for_create(:create, %{profile: %{nickname: "trinity", age: 28}})
+      ResourceWithUnion
+      |> Ash.Changeset.for_create(:create, %{thing: %{nickname: "trinity", age: 28}})
       |> Ash.create!()
 
-    # Round-trips fine *today* because the same struct is binary_to_term'd back.
-    assert %EmbeddedProfile{nickname: "trinity", age: 28} = record.profile
+    assert {:__ash_cloak__, dumped} = decode(record.encrypted_thing)
 
-    # But the value never passed through cast_stored/2: it is the exact same term that
-    # was term_to_binary'd on write. The module name and struct shape are baked into the
-    # blob, so renaming/removing the embedded module, or relying on cast_stored to absorb
-    # a schema change, would not be reflected when reading old ciphertext.
-    stored = decode(record.encrypted_profile)
-    assert stored == record.profile
+    refute is_struct(dumped)
+    assert dumped == embedded_representation(ResourceWithUnion, :thing, record.thing)
+
+    assert %Ash.Union{type: :profile, value: %EmbeddedProfile{nickname: "trinity", age: 28}} =
+             record.thing
+  end
+
+  test "decrypts pre-change data written in the old raw-term format" do
+    # A row written before the storage-representation change: the raw cast struct,
+    # term_to_binary'd, encrypted, base64-encoded — with no :__ash_cloak__ tag.
+    old_blob =
+      %EmbeddedProfile{nickname: "neo", age: 30}
+      |> :erlang.term_to_binary()
+      |> AshCloak.Test.Vault.encrypt!()
+      |> Base.encode64()
+
+    record = %ResourceWithEmbedded{id: Ash.UUID.generate(), encrypted_profile: old_blob}
+
+    loaded = Ash.load!(record, [:profile], domain: AshCloak.Test.Domain)
+
+    assert %EmbeddedProfile{nickname: "neo", age: 30} = loaded.profile
   end
 end

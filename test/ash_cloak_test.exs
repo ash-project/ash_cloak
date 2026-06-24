@@ -10,7 +10,7 @@ defmodule AshCloakTest do
 
   defp decode(value) do
     "encrypted " <> value = Base.decode64!(value)
-    :erlang.binary_to_term(value)
+    Ash.Helpers.non_executable_binary_to_term(value)
   end
 
   test "it encrypts the input values" do
@@ -246,7 +246,7 @@ defmodule AshCloakTest do
     # value is passed through cast_from_embedded on read, which base64-decodes
     # once. Without the fix, AshCloak would then try to base64-decode the raw
     # ciphertext and crash.
-    encrypted_b64 = AshCloak.do_encrypt(AshCloak.Test.EmbeddedResource, 99)
+    encrypted_b64 = AshCloak.do_encrypt(AshCloak.Test.EmbeddedResource, :encrypted, 99)
 
     # Apply what Ash 3.26's cast_from_embedded does to that stored value.
     {:ok, after_cast} = Ash.Type.Binary.cast_from_embedded(encrypted_b64, [])
@@ -262,7 +262,7 @@ defmodule AshCloakTest do
   end
 
   test "round-trips new writes on Ash 3.26+ embedded resources" do
-    encrypted_b64_or_raw = AshCloak.do_encrypt(AshCloak.Test.EmbeddedResource, 42)
+    encrypted_b64_or_raw = AshCloak.do_encrypt(AshCloak.Test.EmbeddedResource, :encrypted, 42)
 
     # Simulate the new write/read cycle: AshCloak produces a value, Ash's
     # dump_to_embedded base64-encodes it for storage, then cast_from_embedded

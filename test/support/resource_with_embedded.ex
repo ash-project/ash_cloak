@@ -6,9 +6,9 @@ defmodule AshCloak.Test.ResourceWithEmbedded do
   @moduledoc """
   A resource with an encrypted attribute whose type is an embedded resource.
 
-  Used to reproduce how ash_cloak serializes embedded values: via
-  `:erlang.term_to_binary/1` on the in-memory struct, rather than through the
-  type's storage representation (`dump_to_native/2`).
+  Used by tests to assert embedded values are encrypted via their embedded
+  representation (`Ash.Type.dump_to_embedded/3`) and restored via
+  `Ash.Type.cast_from_embedded/3`.
   """
 
   use Ash.Resource,
