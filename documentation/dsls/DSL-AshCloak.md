@@ -24,6 +24,7 @@ Encrypt attributes of a resource
 | [`attributes`](#cloak-attributes){: #cloak-attributes } | `atom \| list(atom)` | `[]` | The attribute or attributes to encrypt. The attribute will be renamed to `encrypted_{attribute}`, and a calculation with the same name will be added. |
 | [`decrypt_by_default`](#cloak-decrypt_by_default){: #cloak-decrypt_by_default } | `atom \| list(atom)` | `[]` | A list of attributes that should be decrypted (their calculation should be loaded) by default. |
 | [`on_decrypt`](#cloak-on_decrypt){: #cloak-on_decrypt } | `(any, any, any, any -> any) \| mfa` |  | A function to call when decrypting any value. Takes the resource, field, records, and calculation context. Must return `:ok` or `{:error, error}` |
+| [`encrypt_nil?`](#cloak-encrypt_nil?){: #cloak-encrypt_nil? } | `boolean` | `true` | When `false`, a `nil` value for an encrypted attribute is stored as SQL NULL in the backing `encrypted_*` column instead of being encrypted. This keeps `IS NOT NULL` queries meaningful for nullable attributes. Defaults to `true`, which encrypts `nil` and stores a non-null ciphertext, preserving the original behavior. |
 
 
 
