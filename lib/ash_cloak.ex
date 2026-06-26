@@ -39,6 +39,15 @@ defmodule AshCloak do
         type: {:or, [{:fun, 4}, :mfa]},
         doc:
           "A function to call when decrypting any value. Takes the resource, field, records, and calculation context. Must return `:ok` or `{:error, error}`"
+      ],
+      encrypt_nil?: [
+        type: :boolean,
+        default: true,
+        doc:
+          "When `false`, a `nil` value for an encrypted attribute is stored as SQL NULL in the " <>
+            "backing `encrypted_*` column instead of being encrypted. This keeps `IS NOT NULL` " <>
+            "queries meaningful for nullable attributes. Defaults to `true`, which encrypts `nil` " <>
+            "and stores a non-null ciphertext, preserving the original behavior."
       ]
     ]
   }
@@ -82,17 +91,23 @@ defmodule AshCloak do
 
   @doc false
   def do_encrypt(resource, field, value, context \\ nil) do
-    vault = resolve_vault(resource, context)
-
-    encrypted =
-      resource
-      |> serialize(field, value)
-      |> vault.encrypt!()
-
-    if embedded_binary_handles_encoding?(resource) do
-      encrypted
+    if is_nil(value) and not AshCloak.Info.cloak_encrypt_nil?(resource) do
+      # Storing SQL NULL keeps `IS NOT NULL` queries meaningful for nullable attributes.
+      # On read the decrypt calculation already maps a nil backing value back to nil.
+      nil
     else
-      Base.encode64(encrypted)
+      vault = resolve_vault(resource, context)
+
+      encrypted =
+        resource
+        |> serialize(field, value)
+        |> vault.encrypt!()
+
+      if embedded_binary_handles_encoding?(resource) do
+        encrypted
+      else
+        Base.encode64(encrypted)
+      end
     end
   end
 

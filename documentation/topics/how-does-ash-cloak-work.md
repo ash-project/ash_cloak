@@ -24,6 +24,12 @@ This `change` also deletes the argument from the arguments list and from the par
 
 Finally, it add a `preparation` and a `change` that will automatically load the corresponding calculations for any attribute in the `decrypt_by_default` list.
 
+## Nil handling
+
+By default (`encrypt_nil?: true`), a `nil` value is encrypted like any other value, so the backing `encrypted_*` column holds a non-null ciphertext. This hides whether the attribute has a value at all, but means `encrypted_<name> IS NOT NULL` is always true.
+
+Set `encrypt_nil?: false` to store `nil` as SQL `NULL` in the backing column instead. This keeps `IS NOT NULL` queries meaningful for nullable attributes — useful for cleanup, backfill, and debugging without decrypting every row. On read, the decrypt calculation maps a `NULL` backing value back to `nil`, so the round-trip is unchanged. This option is intended for nullable attributes; assigning `nil` to a non-nullable attribute (for example, via an update) will surface the usual required-value error.
+
 ## The result
 
 The cloaked attribute will now seamlessly encrypt when writing and decrypt on request.
