@@ -89,6 +89,16 @@ defmodule AshCloakTest do
     assert Exception.message(error) =~ "compressed"
   end
 
+  test "the cloaked plaintext argument is redacted (not leaked) in changeset inspect" do
+    # :encrypted is not declared sensitive?; the generated plaintext argument must
+    # still be sensitive so it is redacted in inspects, errors, and logs.
+    changeset =
+      AshCloak.Test.Resource
+      |> Ash.Changeset.for_create(:create, %{encrypted: 987_654_321})
+
+    refute inspect(changeset) =~ "987654321"
+  end
+
   test "it encrypts input values on update" do
     encrypted =
       AshCloak.Test.Resource

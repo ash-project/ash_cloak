@@ -99,11 +99,11 @@ defmodule AshCloak.Transformers.SetupEncryption do
               allow_nil?: attr.allow_nil?,
               constraints: attr.constraints,
               default: attr.default,
-              sensitive?: attr.sensitive?
+              sensitive?: true
             ]
 
           _ ->
-            [constraints: attr.constraints, sensitive?: attr.sensitive?]
+            [constraints: attr.constraints, sensitive?: true]
         end
 
       with {:ok, argument} <-
