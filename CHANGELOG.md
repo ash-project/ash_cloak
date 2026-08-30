@@ -11,6 +11,23 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v0.4.0](https://github.com/ash-project/ash_cloak/compare/v0.3.1...v0.4.0) (2026-08-30)
+
+
+
+
+### Features:
+
+* add encrypt_nil? option to store nil as SQL NULL (#148) by Jinkyou Son
+
+### Bug Fixes:
+
+* always mark the plaintext encryption argument sensitive (CVE-2026-81322) by Zach Daniel
+
+* decode decrypted terms with :safe and reject compressed payloads (CVE-2026-81319) by Zach Daniel
+
+* encrypt embedded via storage representation (#147) by Jinkyou Son
+
 ## [v0.3.1](https://github.com/ash-project/ash_cloak/compare/v0.3.0...v0.3.1) (2026-06-03)
 
 
