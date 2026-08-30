@@ -46,6 +46,49 @@ defmodule AshCloakTest do
     refute_received {:decrypting, _, _, _, _}
   end
 
+  test "decryption rejects a forged payload instead of interning unknown atoms" do
+    # ETF for an atom that does not exist yet, built by hand so this test never
+    # interns it. The trivial test vault simply prefixes "encrypted ".
+    name = "ash_cloak_unsafe_atom_#{System.unique_integer([:positive])}"
+    forged_term = <<131, 119, byte_size(name)::8, name::binary>>
+    forged_stored = Base.encode64("encrypted " <> forged_term)
+
+    record =
+      Ash.Seed.seed!(AshCloak.Test.Resource, %{
+        encrypted_encrypted_always_loaded: forged_stored
+      })
+
+    # Decoding must reject the unknown atom (via :safe), not silently intern it.
+    error =
+      assert_raise Ash.Error.Unknown, fn ->
+        Ash.load!(record, :encrypted_always_loaded)
+      end
+
+    assert Exception.message(error) =~ "unsafe"
+
+    assert_raise ArgumentError, fn -> String.to_existing_atom(name) end
+  end
+
+  test "decryption refuses a compressed term to avoid a decompression bomb" do
+    # A compressed ETF payload; the encrypt side never produces one, and :safe
+    # would otherwise inflate it.
+    compressed = :erlang.term_to_binary(List.duplicate("aaaaaaaa", 2000), [:compressed])
+    <<131, 80, _::binary>> = compressed
+    forged_stored = Base.encode64("encrypted " <> compressed)
+
+    record =
+      Ash.Seed.seed!(AshCloak.Test.Resource, %{
+        encrypted_encrypted_always_loaded: forged_stored
+      })
+
+    error =
+      assert_raise Ash.Error.Unknown, fn ->
+        Ash.load!(record, :encrypted_always_loaded)
+      end
+
+    assert Exception.message(error) =~ "compressed"
+  end
+
   test "it encrypts input values on update" do
     encrypted =
       AshCloak.Test.Resource

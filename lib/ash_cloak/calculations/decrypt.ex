@@ -27,7 +27,7 @@ defmodule AshCloak.Calculations.Decrypt do
               value
               |> maybe_decode64(skip_base64?)
               |> vault.decrypt!()
-              |> Ash.Helpers.non_executable_binary_to_term()
+              |> safe_binary_to_term()
               |> deserialize(type, constraints)
           end
         end)
@@ -38,6 +38,19 @@ defmodule AshCloak.Calculations.Decrypt do
   end
 
   def calculate([], _, _), do: []
+
+  # Reject the compressed external-term format outright: our encrypt side uses
+  # `:erlang.term_to_binary/1` with no `:compressed`, so a legitimate payload
+  # never begins with <<131, 80>>. Refusing it avoids a decompression bomb, which
+  # `:safe` does not (binary_to_term inflates compressed terms regardless).
+  defp safe_binary_to_term(<<131, 80, _rest::binary>>) do
+    raise ArgumentError, "refusing to decode a compressed term during decryption"
+  end
+
+  # `:safe` prevents interning attacker-chosen atoms (and rejects funs/refs/ports).
+  defp safe_binary_to_term(binary) do
+    Ash.Helpers.non_executable_binary_to_term(binary, [:safe])
+  end
 
   # Values written after the serialization change are tagged and restored via
   # `Ash.Type.cast_from_embedded/3`. Values written before it — and scalar values, which
