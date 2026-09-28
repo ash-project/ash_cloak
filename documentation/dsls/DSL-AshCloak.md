@@ -25,6 +25,7 @@ Encrypt attributes of a resource
 | [`decrypt_by_default`](#cloak-decrypt_by_default){: #cloak-decrypt_by_default } | `atom \| list(atom)` | `[]` | A list of attributes that should be decrypted (their calculation should be loaded) by default. |
 | [`on_decrypt`](#cloak-on_decrypt){: #cloak-on_decrypt } | `(any, any, any, any -> any) \| mfa` |  | A function to call when decrypting any value. Takes the resource, field, records, and calculation context. Must return `:ok` or `{:error, error}` |
 | [`encrypt_nil?`](#cloak-encrypt_nil?){: #cloak-encrypt_nil? } | `boolean` | `true` | When `false`, a `nil` value for an encrypted attribute is stored as SQL NULL in the backing `encrypted_*` column instead of being encrypted. This keeps `IS NOT NULL` queries meaningful for nullable attributes. Defaults to `true`, which encrypts `nil` and stores a non-null ciphertext, preserving the original behavior. |
+| [`safe_decode?`](#cloak-safe_decode?){: #cloak-safe_decode? } | `boolean` | `true` | When `true`, decrypted payloads are decoded with `:erlang.binary_to_term/2`'s `:safe` option, which refuses terms containing atoms not yet in the VM. This guards against forged payloads interning arbitrary atoms when the vault is unauthenticated. Set it to `false` if you use an authenticated cipher (e.g. AES-GCM) and legitimate data fails to decode because an embedded type's module (and so its attribute-name atoms) is loaded lazily, as in dev/test. Executable terms (funs, refs, ports) and compressed payloads are rejected either way. |
 
 
 

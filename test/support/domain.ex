@@ -13,5 +13,6 @@ defmodule AshCloak.Test.Domain do
     resource(AshCloak.Test.ContainerResource)
     resource(AshCloak.Test.ResourceWithEmbedded)
     resource(AshCloak.Test.ResourceWithUnion)
+    resource(AshCloak.Test.UnsafeDecodeResource)
   end
 end

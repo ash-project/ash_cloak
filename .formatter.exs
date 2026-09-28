@@ -7,6 +7,7 @@ spark_locals_without_parens = [
   decrypt_by_default: 1,
   encrypt_nil?: 1,
   on_decrypt: 1,
+  safe_decode?: 1,
   vault: 1
 ]
 
