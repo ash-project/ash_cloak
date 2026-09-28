@@ -48,6 +48,18 @@ defmodule AshCloak do
             "backing `encrypted_*` column instead of being encrypted. This keeps `IS NOT NULL` " <>
             "queries meaningful for nullable attributes. Defaults to `true`, which encrypts `nil` " <>
             "and stores a non-null ciphertext, preserving the original behavior."
+      ],
+      safe_decode?: [
+        type: :boolean,
+        default: true,
+        doc:
+          "When `true`, decrypted payloads are decoded with `:erlang.binary_to_term/2`'s `:safe` " <>
+            "option, which refuses terms containing atoms not yet in the VM. This guards against " <>
+            "forged payloads interning arbitrary atoms when the vault is unauthenticated. Set it " <>
+            "to `false` if you use an authenticated cipher (e.g. AES-GCM) and legitimate data fails " <>
+            "to decode because an embedded type's module (and so its attribute-name atoms) is " <>
+            "loaded lazily, as in dev/test. Executable terms (funs, refs, ports) and compressed " <>
+            "payloads are rejected either way."
       ]
     ]
   }

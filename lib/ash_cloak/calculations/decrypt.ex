@@ -12,6 +12,7 @@ defmodule AshCloak.Calculations.Decrypt do
     vault = AshCloak.resolve_vault(resource, context)
     plain_field = opts[:plain_field]
     skip_base64? = AshCloak.embedded_binary_handles_encoding?(resource)
+    decode_opts = if AshCloak.Info.cloak_safe_decode?(resource), do: [:safe], else: []
     %{type: type, constraints: constraints} = Ash.Resource.Info.calculation(resource, plain_field)
 
     case approve_decrypt(resource, records, plain_field, context) do
@@ -27,7 +28,7 @@ defmodule AshCloak.Calculations.Decrypt do
               value
               |> maybe_decode64(skip_base64?)
               |> vault.decrypt!()
-              |> safe_binary_to_term()
+              |> safe_binary_to_term(decode_opts)
               |> deserialize(type, constraints)
           end
         end)
@@ -43,13 +44,14 @@ defmodule AshCloak.Calculations.Decrypt do
   # `:erlang.term_to_binary/1` with no `:compressed`, so a legitimate payload
   # never begins with <<131, 80>>. Refusing it avoids a decompression bomb, which
   # `:safe` does not (binary_to_term inflates compressed terms regardless).
-  defp safe_binary_to_term(<<131, 80, _rest::binary>>) do
+  defp safe_binary_to_term(<<131, 80, _rest::binary>>, _opts) do
     raise ArgumentError, "refusing to decode a compressed term during decryption"
   end
 
-  # `:safe` prevents interning attacker-chosen atoms (and rejects funs/refs/ports).
-  defp safe_binary_to_term(binary) do
-    Ash.Helpers.non_executable_binary_to_term(binary, [:safe])
+  # `:safe` (unless disabled via `safe_decode?`) prevents interning attacker-chosen
+  # atoms; funs/refs/ports are rejected by `non_executable_binary_to_term/2` regardless.
+  defp safe_binary_to_term(binary, opts) do
+    Ash.Helpers.non_executable_binary_to_term(binary, opts)
   end
 
   # Values written after the serialization change are tagged and restored via
