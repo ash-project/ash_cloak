@@ -11,6 +11,15 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v0.5.0](https://github.com/ash-project/ash_cloak/compare/v0.4.0...v0.5.0) (2026-10-25)
+
+
+
+
+### Features:
+
+* add safe_decode? option to decode decrypted terms without :safe (#152) by Jinkyou Son
+
 ## [v0.4.0](https://github.com/ash-project/ash_cloak/compare/v0.3.1...v0.4.0) (2026-08-30)
 
 

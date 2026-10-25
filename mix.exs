@@ -9,7 +9,7 @@ defmodule AshCloak.MixProject do
   An Ash extension to seamlessly encrypt and decrypt resource attributes.
   """
 
-  @version "0.4.0"
+  @version "0.5.0"
 
   def project do
     [
