@@ -216,8 +216,9 @@ defmodule AshCloakTest do
   end
 
   test "it does not encrypt when the attribute is not in the accept list" do
+    # the encrypted input is only added to actions that accept the attribute
     assert_raise Ash.Error.Invalid,
-                 ~r/attribute encrypted_encrypted_with_default is required/,
+                 ~r/No such input `encrypted` for action AshCloak.Test.Resource.change_without_accept/,
                  fn ->
                    AshCloak.Test.Resource
                    |> Ash.Changeset.for_create(:change_without_accept)
