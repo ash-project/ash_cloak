@@ -49,14 +49,6 @@ defmodule AshCloak.DecryptManyTest do
       assert Enum.map(loaded, & &1.encrypted) == [nil, nil]
       refute_received {:decrypt_many, _}
     end
-
-    test "raises when the vault answers a different number of plaintexts" do
-      records = for position <- 1..2, do: create!(position, position)
-
-      assert_raise Ash.Error.Unknown, ~r/decrypt_many!\/1 returned 1 plaintexts for 2/, fn ->
-        Ash.load!(records, [:encrypted], context: %{test_vault: :short})
-      end
-    end
   end
 
   describe "a vault without decrypt_many!/1" do

@@ -32,7 +32,7 @@ Set `encrypt_nil?: false` to store `nil` as SQL `NULL` in the backing column ins
 
 ## Decrypting in batches
 
-The decrypt calculation calls the vault's `decrypt!/1` once per value. A vault module that also exports `decrypt_many!/1` is called once per loaded attribute instead, with the ciphertexts of every record being loaded that have a value, and must return one plaintext per ciphertext, in the same order. This is useful when decrypting needs something that is cheaper to fetch once for the whole batch, such as a key held outside the application.
+The decrypt calculation calls the vault's `decrypt!/1` once per value. A vault module that also exports `decrypt_many!/1` is called once per loaded attribute instead, with the ciphertexts of every record being loaded that have a value, and must return exactly one plaintext per ciphertext, in the same order. AshCloak does not check this; a vault that returns a different number of plaintexts makes the load raise. This is useful when decrypting needs something that is cheaper to fetch once for the whole batch, such as a key held outside the application.
 
 ```elixir
 defmodule MyApp.Vault do

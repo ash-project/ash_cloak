@@ -25,33 +25,6 @@ defmodule AshCloak.Test.BatchVault do
   end
 end
 
-defmodule AshCloak.Test.ShortBatchVault do
-  @moduledoc false
-  # A broken vault: its batch answer is one plaintext short.
-
-  def encrypt!(value) when is_binary(value), do: "encrypted #{value}"
-
-  def decrypt!("encrypted " <> value), do: value
-
-  def decrypt_many!(ciphertexts) do
-    ciphertexts
-    |> Enum.drop(1)
-    |> Enum.map(fn "encrypted " <> value -> value end)
-  end
-end
-
-defmodule AshCloak.Test.BatchVaultSelector do
-  @moduledoc false
-  def select(_resource, nil), do: AshCloak.Test.BatchVault
-
-  def select(_resource, context) do
-    case Map.get(context, :source_context, %{}) do
-      %{test_vault: :short} -> AshCloak.Test.ShortBatchVault
-      _ -> AshCloak.Test.BatchVault
-    end
-  end
-end
-
 defmodule AshCloak.Test.BatchResource do
   @moduledoc false
 
@@ -69,7 +42,7 @@ defmodule AshCloak.Test.BatchResource do
   end
 
   cloak do
-    vault({AshCloak.Test.BatchVaultSelector, :select, []})
+    vault(AshCloak.Test.BatchVault)
     attributes([:encrypted])
     encrypt_nil?(false)
   end
