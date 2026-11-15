@@ -20,7 +20,7 @@ defmodule AshCloak do
       vault: [
         type: {:or, [{:behaviour, Cloak.Vault}, {:fun, 2}, :mfa]},
         doc:
-          "The vault to use to encrypt & decrypt the value. Accepts a module implementing `Cloak.Vault`, a `fun/2` of the form `(resource_module, context) -> vault_module`, or an MFA tuple. When a function or MFA is given, it is called at every encrypt and decrypt operation and its return value is used as the vault module.",
+          "The vault to use to encrypt & decrypt the value. Accepts a module implementing `Cloak.Vault`, a `fun/2` of the form `(resource_module, context) -> vault_module`, or an MFA tuple. When a function or MFA is given, it is called at every encrypt and decrypt operation and its return value is used as the vault module. A vault module that also exports `decrypt_many!/1` is given all the ciphertexts of a load in one call.",
         required: true
       ],
       attributes: [

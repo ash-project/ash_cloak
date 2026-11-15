@@ -30,6 +30,23 @@ By default (`encrypt_nil?: true`), a `nil` value is encrypted like any other val
 
 Set `encrypt_nil?: false` to store `nil` as SQL `NULL` in the backing column instead. This keeps `IS NOT NULL` queries meaningful for nullable attributes — useful for cleanup, backfill, and debugging without decrypting every row. On read, the decrypt calculation maps a `NULL` backing value back to `nil`, so the round-trip is unchanged. This option is intended for nullable attributes; assigning `nil` to a non-nullable attribute (for example, via an update) will surface the usual required-value error.
 
+## Decrypting in batches
+
+The decrypt calculation calls the vault's `decrypt!/1` once per value. A vault module that also exports `decrypt_many!/1` is called once per loaded attribute instead, with the ciphertexts of every record being loaded that have a value, and must return one plaintext per ciphertext, in the same order. This is useful when decrypting needs something that is cheaper to fetch once for the whole batch, such as a key held outside the application.
+
+```elixir
+defmodule MyApp.Vault do
+  use Cloak.Vault, otp_app: :my_app
+
+  def decrypt_many!(ciphertexts) do
+    keys = fetch_keys(ciphertexts)
+    Enum.map(ciphertexts, &decrypt_with(&1, keys))
+  end
+end
+```
+
+A vault without `decrypt_many!/1` behaves as before.
+
 ## The result
 
 The cloaked attribute will now seamlessly encrypt when writing and decrypt on request.
