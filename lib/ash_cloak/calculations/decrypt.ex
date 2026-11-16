@@ -17,21 +17,25 @@ defmodule AshCloak.Calculations.Decrypt do
 
     case approve_decrypt(resource, records, plain_field, context) do
       :ok ->
-        Enum.map(records, fn record ->
-          record
-          |> Map.get(opts[:field])
-          |> case do
-            nil ->
-              nil
+        values = Enum.map(records, &Map.get(&1, opts[:field]))
 
-            value ->
-              value
-              |> maybe_decode64(skip_base64?)
-              |> vault.decrypt!()
-              |> safe_binary_to_term(decode_opts)
-              |> deserialize(type, constraints)
-          end
-        end)
+        plaintexts =
+          values
+          |> Enum.reject(&is_nil/1)
+          |> Enum.map(&maybe_decode64(&1, skip_base64?))
+          |> decrypt_all(vault)
+
+        {decrypted, []} =
+          Enum.map_reduce(values, plaintexts, fn
+            nil, rest ->
+              {nil, rest}
+
+            _value, [plaintext | rest] ->
+              {plaintext |> safe_binary_to_term(decode_opts) |> deserialize(type, constraints),
+               rest}
+          end)
+
+        decrypted
 
       {:error, error} ->
         {:error, error}
@@ -39,6 +43,20 @@ defmodule AshCloak.Calculations.Decrypt do
   end
 
   def calculate([], _, _), do: []
+
+  # A vault that exports `decrypt_many!/1` is handed every ciphertext of the batch in one
+  # call, and must answer exactly one plaintext per ciphertext, in order. That is not
+  # checked: a vault that answers a different number fails the match in `calculate/3`.
+  # Any other vault is called once per value.
+  defp decrypt_all([], _vault), do: []
+
+  defp decrypt_all(ciphertexts, vault) do
+    if Code.ensure_loaded?(vault) and function_exported?(vault, :decrypt_many!, 1) do
+      vault.decrypt_many!(ciphertexts)
+    else
+      Enum.map(ciphertexts, &vault.decrypt!/1)
+    end
+  end
 
   # Reject the compressed external-term format outright: our encrypt side uses
   # `:erlang.term_to_binary/1` with no `:compressed`, so a legitimate payload
